@@ -15,6 +15,9 @@ NJGLOBAL = 450                  !
                                 ! y-direction in the physical domain. With STATIC_MEMORY_
                                 ! this is set in MOM_memory.h at compile time.
 
+! === module MOM_hor_index ===
+! Sets the horizontal array index types.
+
 ! === module MOM_grid ===
 ! Parameters providing information about the vertical grid.
 G_EARTH = 9.8                   !   [m s-2] default = 9.8
@@ -276,6 +279,8 @@ TOPO_FILE = "MESO_025_63L_topog.nc" ! default = "topog.nc"
                                 ! The file from which the bathymetry is read.
 TOPO_VARNAME = "depth_t"        ! default = "depth"
                                 ! The name of the bathymetry variable in TOPO_FILE.
+TOPO_EDITS_FILE = ""            ! default = ""
+                                ! The file from which to read a list of i,j,z topography overrides.
 MAXIMUM_DEPTH = 5500.0          !   [m]
                                 ! The maximum depth of the ocean.
 MINIMUM_DEPTH = 15.0            !   [m] default = 0.0
@@ -912,6 +917,12 @@ KHTH_MIN = 0.0                  !   [m2 s-1] default = 0.0
                                 ! The minimum horizontal thickness diffusivity.
 KHTH_MAX = 0.0                  !   [m2 s-1] default = 0.0
                                 ! The maximum horizontal thickness diffusivity.
+KHTH_MAX_CFL = 0.8              !   [nondimensional] default = 0.8
+                                ! The maximum value of the local diffusive CFL ratio that
+                                ! is permitted for the thickness diffusivity. 1.0 is the
+                                ! marginally unstable value in a pure layered model, but
+                                ! much smaller numbers (e.g. 0.1) seem to work better for
+                                ! ALE-based models.
 DETANGLE_INTERFACES = False     !   [Boolean] default = False
                                 ! If defined add 3-d structured enhanced interface height
                                 ! diffusivities to horizonally smooth jagged layers.
@@ -925,8 +936,9 @@ KD_SMOOTH = 1.0E-06             !   [not defined] default = 1.0E-06
 ! === module MOM_mixed_layer_restrat ===
 MIXEDLAYER_RESTRAT = True       !   [Boolean] default = False
                                 ! If true, a density-gradient dependent re-stratifying
-                                ! flow is imposed in the mixed layer.
-                                ! This is only used if BULKMIXEDLAYER is true.
+                                ! flow is imposed in the mixed layer. Can be used in ALE mode
+                                ! without restriction but in layer mode can only be used if
+                                ! BULKMIXEDLAYER is true.
 FOX_KEMPER_ML_RESTRAT_COEF = 5.0 !   [nondim] default = 0.0
                                 ! A nondimensional coefficient that is proportional to
                                 ! the ratio of the deformation radius to the dominant
@@ -961,15 +973,6 @@ MASSLESS_MATCH_TARGETS = True   !   [Boolean] default = True
                                 ! are kept consistent with their target densities.
                                 ! Otherwise the properties of massless layers evolve
                                 ! diffusively to match massive neighboring layers.
-RECLAIM_FRAZIL = False          !   [Boolean] default = True
-                                ! If true, try to use any frazil heat deficit to cool any
-                                ! overlying layers down to the freezing point, thereby
-                                ! avoiding the creation of thin ice when the SST is above
-                                ! the freezing point.
-PRESSURE_DEPENDENT_FRAZIL = False !   [Boolean] default = False
-                                ! If true, use a pressure dependent freezing temperature
-                                ! when making frazil. The default is false, which will be
-                                ! faster but is inappropriate with ice-shelf cavities.
 AGGREGATE_FW_FORCING = True     !   [Boolean] default = True
                                 ! If true, the net incoming and outgoing fresh water fluxes are combined
                                 ! and applied as either incoming or outgoing depending on the sign of the net.
@@ -995,6 +998,42 @@ DIAG_MLD_DENSITY_DIFF = 0.1     !   [kg/m3] default = 0.1
                                 ! layer depth, MLD_user, following the definition of Levitus 1982.
                                 ! The MLD is the depth at which the density is larger than the
                                 ! surface density by the specified amount.
+
+! === module MOM_KPP ===
+! This is the MOM wrapper to CVmix:KPP
+! See http://code.google.com/p/cvmix/
+USE_KPP = False                 !   [Boolean] default = False
+                                ! If true, turns on the [CVmix] KPP scheme of Large et al., 1994,
+                                ! to calculate diffusivities and non-local transport in the OBL.
+SALT_REJECT_BELOW_ML = False    !   [Boolean] default = False
+                                ! If true, place salt from brine rejection below the mixed layer,
+                                ! into the first non-vanished layer for which the column remains stable
+
+! === module MOM_diffConvection ===
+! This module implements enhanced diffusivity as a
+! function of static stability, N^2.
+USE_CONVECTION = False          !   [Boolean] default = False
+                                ! If true, turns on the diffusive convection scheme that
+                                ! increases diapycnal diffusivities at statically unstable
+                                ! interfaces. Relevant parameters are contained in the
+                                ! CONVECTION% parameter block.
+CONVECTION%
+PASSIVE = False                 !   [Boolean] default = False
+                                ! If True, puts KPP into a passive-diagnostic mode.
+KD_CONV = 1.0                   !   [m2/s] default = 1.0
+                                ! DIffusivity used in statically unstable regions of column.
+%CONVECTION
+
+! === module MOM_entrain_diffusive ===
+CORRECT_DENSITY = True          !   [Boolean] default = True
+                                ! If true, and USE_EOS is true, the layer densities are
+                                ! restored toward their target values by the diapycnal
+                                ! mixing, as described in Hallberg (MWR, 2000).
+MAX_ENT_IT = 20                 ! default = 5
+                                ! The maximum number of iterations that may be used to
+                                ! calculate the interior diapycnal entrainment.
+TOLERANCE_ENT = 1.0E-05         !   [m] default = 1.095445115010332E-05
+                                ! The tolerance with which to solve for entrainment values.
 FLUX_RI_MAX = 0.2               !   [not defined] default = 0.2
                                 ! The flux Richardson number where the stratification is
                                 ! large enough that N2 > omega2.  The full expression for
@@ -1090,6 +1129,12 @@ LEE_WAVE_DISSIPATION = False    !   [Boolean] default = False
                                 ! drive diapycnal mixing, along the lines of Nikurashin
                                 ! (2010) and using the St. Laurent et al. (2002)
                                 ! and Simmons et al. (2004) vertical profile
+INT_TIDE_LOWMODE_DISSIPATION = False !   [Boolean] default = False
+                                ! If true, consider mixing due to breaking low modes that
+                                ! have been remotely generated; as with itidal drag on the
+                                ! barotropic tide, use an internal tidal dissipation scheme to
+                                ! drive diapycnal mixing, along the lines of St. Laurent
+                                ! et al. (2002) and Simmons et al. (2004).
 USER_CHANGE_DIFFUSIVITY = False !   [Boolean] default = False
                                 ! If true, call user-defined code to change the diffusivity.
 DISSIPATION_MIN = 0.0           !   [W m-3] default = 0.0
@@ -1169,41 +1214,26 @@ KAPPA_SHEAR_MERGE_ML = True     !   [Boolean] default = True
                                 ! If true, combine the mixed layers together before
                                 ! solving the kappa-shear equations.
 
-! === module MOM_KPP ===
-! This is the MOM wrapper to CVmix:KPP
-! See http://code.google.com/p/cvmix/
-USE_KPP = False                 !   [Boolean] default = False
-                                ! If true, turns on the [CVmix] KPP scheme of Large et al., 1994,
-                                ! to calculate diffusivities and non-local transport in the OBL.
-SALT_REJECT_BELOW_ML = False    !   [Boolean] default = False
-                                ! If true, place salt from brine rejection below the mixed layer,
-                                ! into the first non-vanished layer for which the column remains stable
-
-! === module MOM_diffConvection ===
-! This module implements enhanced diffusivity as a
-! function of static stability, N^2.
-USE_CONVECTION = False          !   [Boolean] default = False
-                                ! If true, turns on the diffusive convection scheme that
-                                ! increases diapycnal diffusivities at statically unstable
-                                ! interfaces. Relevant parameters are contained in the
-                                ! CONVECTION% parameter block.
-CONVECTION%
-PASSIVE = False                 !   [Boolean] default = False
-                                ! If True, puts KPP into a passive-diagnostic mode.
-KD_CONV = 1.0                   !   [m2/s] default = 1.0
-                                ! DIffusivity used in statically unstable regions of column.
-%CONVECTION
-
-! === module MOM_entrain_diffusive ===
-CORRECT_DENSITY = True          !   [Boolean] default = True
-                                ! If true, and USE_EOS is true, the layer densities are
-                                ! restored toward their target values by the diapycnal
-                                ! mixing, as described in Hallberg (MWR, 2000).
-MAX_ENT_IT = 20                 ! default = 5
-                                ! The maximum number of iterations that may be used to
-                                ! calculate the interior diapycnal entrainment.
-TOLERANCE_ENT = 1.0E-05         !   [m] default = 1.095445115010332E-05
-                                ! The tolerance with which to solve for entrainment values.
+! === module MOM_diabatic_aux ===
+! The following parameters are used for auxiliary diabatic processes.
+RECLAIM_FRAZIL = False          !   [Boolean] default = True
+                                ! If true, try to use any frazil heat deficit to cool any
+                                ! overlying layers down to the freezing point, thereby
+                                ! avoiding the creation of thin ice when the SST is above
+                                ! the freezing point.
+PRESSURE_DEPENDENT_FRAZIL = False !   [Boolean] default = False
+                                ! If true, use a pressure dependent freezing temperature
+                                ! when making frazil. The default is false, which will be
+                                ! faster but is inappropriate with ice-shelf cavities.
+MINIMUM_FORCING_DEPTH = 0.001   !   [m] default = 0.001
+                                ! The smallest depth over which forcing can be applied. This
+                                ! only takes effect when near-surface layers become thin
+                                ! relative to this scale, in which case the forcing tendencies
+                                ! scaled down by distributing the forcing over this depth scale.
+EVAP_CFL_LIMIT = 0.8            !   [nondim] default = 0.8
+                                ! The largest fraction of a layer than can be lost to forcing
+                                ! (e.g. evaporation, sea-ice formation) in one time-step. The unused
+                                ! mass loss is passed down through the column.
 
 ! === module MOM_mixed_layer ===
 NSTAR = 0.15                    !   [nondim] default = 0.15
@@ -1348,6 +1378,11 @@ CHECK_DIFFUSIVE_CFL = False     !   [Boolean] default = False
                                 ! If true, use enough iterations the diffusion to ensure
                                 ! that the diffusive equivalent of the CFL limit is not
                                 ! violated.  If false, always use 1 iteration.
+
+! === module MOM_neutral_diffusion ===
+! This module implements neutral diffusion of tracers
+USE_NEUTRAL_DIFFUSION = False   !   [Boolean] default = False
+                                ! If true, enables the neutral diffusion module.
 OBSOLETE_DIAGNOSTIC_IS_FATAL = True !   [Boolean] default = True
                                 ! If an obsolete diagnostic variable appears in the diag_table
                                 ! then cause a FATAL error rather than issue a WARNING.
@@ -1434,9 +1469,11 @@ MAX_ENERGY = 0.0                !   [m2 s-2] default = 0.0
                                 ! The maximum permitted average energy per unit mass; the
                                 ! model will be stopped if there is more energy than
                                 ! this.  If zero or negative, this is set to 10*MAXVEL^2.
-ENERGYFILE = "timestats"        ! default = "timestats"
+ENERGYFILE = "ocean.stats"      ! default = "ocean.stats"
                                 ! The file to use to write the energies and globally
                                 ! summed diagnostics.
+DATE_STAMPED_STDOUT = True      !   [Boolean] default = True
+                                ! If true, use dates (not times) in messages to stdout
 TIMEUNIT = 3600.0               !   [s] default = 8.64E+04
                                 ! The time unit in seconds a number of input fields
 READ_DEPTH_LIST = False         !   [Boolean] default = False
@@ -1477,7 +1514,7 @@ RESTINT = 0.0                   !   [hours] default = 0.0
                                 ! The interval between saves of the restart file in units
                                 ! of TIMEUNIT.  Use 0 (the default) to not save
                                 ! incremental restart files at all.
-ENERGYSAVEDAYS = 1.0            !   [hours] default = 8.64E+04
+ENERGYSAVEDAYS = 1.0            !   [hours] default = 1.0
                                 ! The interval in units of TIMEUNIT between saves of the
                                 ! energies of the run and other globally summed diagnostics.
 ICE_SHELF = False               !   [Boolean] default = False

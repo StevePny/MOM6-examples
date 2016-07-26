@@ -1,4 +1,8 @@
 ! This file was written by the model and records the layout parameters used at run-time.
+GLOBAL_INDEXING = False         !   [Boolean] default = False
+                                ! If true, use a global lateral indexing convention, so
+                                ! that corresponding points on different processors have
+                                ! the same index. This does not work with static memory.
 !SYMMETRIC_MEMORY_ = False      !   [Boolean]
                                 ! If defined, the velocity point data domain includes
                                 ! every face of the thickness points. In other words,
@@ -15,12 +19,12 @@ NONBLOCKING_UPDATES = False     !   [Boolean] default = False
                                 ! until run time. The STATIC option is substantially
                                 ! faster, but does not allow the PE count to be changed
                                 ! at run time.  This can only be set at compile time.
-NIHALO = 2                      ! default = 2
+NIHALO = 2                      ! default = 4
                                 ! The number of halo points on each side in the
                                 ! x-direction.  With STATIC_MEMORY_ this is set as NIHALO_
                                 ! in MOM_memory.h at compile time; without STATIC_MEMORY_
                                 ! the default is NIHALO_ in MOM_memory.h (if defined) or 2.
-NJHALO = 2                      ! default = 2
+NJHALO = 2                      ! default = 4
                                 ! The number of halo points on each side in the
                                 ! y-direction.  With STATIC_MEMORY_ this is set as NJHALO_
                                 ! in MOM_memory.h at compile time; without STATIC_MEMORY_

@@ -5,8 +5,9 @@
 "prog",     1,"days",1,"days","Time",
 "prog_z",   1,"days",1,"days","Time",
 "ave_prog", 1,"days",1,"days","Time",
+"tracer",   1,"days",1,"days","Time",
 "cont",     1,"days",1,"days","Time",
-#"mom",      5,"days",1,"days","Time",
+#"mom",     5,"days",1,"days","Time",
 #"bt_mom",   5,"days",1,"days","Time",
 "visc",     1,"days",1,"days","Time",
 #"energy",   5,"days",1,"days","Time",
@@ -16,6 +17,7 @@
 "ocean_static",       -1,"days",1,"days","time",
 
 "cmor",               1,"days",1,"days","Time",
+"cmor2",              1,"days",1,"days","Time",
 "cmor_z",             1,"days",1,"days","Time",
 "cmor_scalar",        1,"days",1,"days","Time",
 "ocean_static_cmor", -1,"days",1,"days","time",
@@ -67,10 +69,10 @@
 
 # Z-space fields:
 #==================
-"ocean_model","u_z","u","prog_z","all",.true.,"none",2
-"ocean_model","v_z","v","prog_z","all",.true.,"none",2
-"ocean_model","temp_z","temp","prog_z","all",.true.,"none",2
-"ocean_model","salt_z","salt","prog_z","all",.true.,"none",2
+"ocean_model_z","u","u","prog_z","all",.true.,"none",2
+"ocean_model_z","v","v","prog_z","all",.true.,"none",2
+"ocean_model_z","temp","temp","prog_z","all",.true.,"none",2
+"ocean_model_z","salt","salt","prog_z","all",.true.,"none",2
 
 # Auxilary Tracers:
 #==================
@@ -92,9 +94,17 @@
 "ocean_model","vh_rho","vh_rho","cont","all",.true.,"none",2
 "ocean_model","uhGM_rho","uhGM_rho","cont","all",.true.,"none",2
 "ocean_model","vhGM_rho","vhGM_rho","cont","all",.true.,"none",2
-#"ocean_model","KH_u","KH_u","cont","all",.true.,"none",2
-#"ocean_model","KH_v","KH_v","cont","all",.true.,"none",2
-#"ocean_model","GMwork","GMwork","cont","all",.true.,"none",2
+"ocean_model","KHth_u","KHth_u","cont","all",.true.,"none",2
+"ocean_model","KHth_v","KHth_v","cont","all",.true.,"none",2
+"ocean_model","diftrblo","diftrblo","cont","all",.true.,"none",2
+"ocean_model","diftrelo","difteblo","cont","all",.true.,"none",2
+"ocean_model","KHTR_u","KHTR_u","cont","all",.true.,"none",2
+"ocean_model","KHTR_v","KHTR_v","cont","all",.true.,"none",2
+"ocean_model","GMwork","GMwork","cont","all",.true.,"none",2
+"ocean_model","umo","umo","cont","all",.true.,"none",2
+"ocean_model","vmo","vmo","cont","all",.true.,"none",2
+"ocean_model","umo_2d","umo_2d","cont","all",.true.,"none",2
+"ocean_model","vmo_2d","vmo_2d","cont","all",.true.,"none",2
 
 # Continuity Equation Terms In Pure Potential Density Coordiantes:
 #=================================================================
@@ -107,14 +117,67 @@
 #
 # Tracer Fluxes:
 #==================
-#"ocean_model","T_adx",  "T_adx",  "ave_prog","all",.true.,"none",2
-#"ocean_model","T_ady",  "T_ady",  "ave_prog","all",.true.,"none",2
-#"ocean_model","T_diffx","T_diffx","ave_prog","all",.true.,"none",2
-#"ocean_model","T_diffy","T_diffy","ave_prog","all",.true.,"none",2
-#"ocean_model","S_adx",  "S_adx",  "ave_prog","all",.true.,"none",2
-#"ocean_model","S_ady",  "S_ady",  "ave_prog","all",.true.,"none",2
-#"ocean_model","S_diffx","S_diffx","ave_prog","all",.true.,"none",2
-#"ocean_model","S_diffy","S_diffy","ave_prog","all",.true.,"none",2
+"ocean_model","T_adx",  "T_adx",  "tracer","all",.true.,"none",2
+"ocean_model","T_ady",  "T_ady",  "tracer","all",.true.,"none",2
+"ocean_model","T_diffx","T_diffx","tracer","all",.true.,"none",2
+"ocean_model","T_diffy","T_diffy","tracer","all",.true.,"none",2
+"ocean_model","S_adx",  "S_adx",  "tracer","all",.true.,"none",2
+"ocean_model","S_ady",  "S_ady",  "tracer","all",.true.,"none",2
+"ocean_model","S_diffx","S_diffx","tracer","all",.true.,"none",2
+"ocean_model","S_diffy","S_diffy","tracer","all",.true.,"none",2
+
+# T/S net tendency, lateral advection, and vertical remapping budget terms 
+#==================
+# hfds-hfsifrazil = boundary_forcing_heat_tendency_2d
+"ocean_model","rsdoabsorb"                     ,"rsdoabsorb",                      "tracer","all",.true.,"none",2
+"ocean_model","boundary_forcing_temp_tendency" ,"boundary_forcing_temp_tendency",  "tracer","all",.true.,"none",2
+"ocean_model","boundary_forcing_saln_tendency" ,"boundary_forcing_saln_tendency",  "tracer","all",.true.,"none",2
+"ocean_model","boundary_forcing_heat_tendency" ,"boundary_forcing_heat_tendency",  "tracer","all",.true.,"none",2
+"ocean_model","boundary_forcing_salt_tendency" ,"boundary_forcing_salt_tendency",  "tracer","all",.true.,"none",2
+"ocean_model","boundary_forcing_heat_tendency_2d" ,"boundary_forcing_heat_tendency_2d",  "tracer","all",.true.,"none",2
+"ocean_model","boundary_forcing_salt_tendency_2d" ,"boundary_forcing_salt_tendency_2d",  "tracer","all",.true.,"none",2
+
+# opottemptend_2d = T_advection_xy_2d + hfds + hfgeo + opottemppmdiff_2d
+# note: Th_tendency_vert_remap_2d = 0
+"ocean_model","T_tendency"          ,"T_tendency",               "tracer","all",.true.,"none",2
+"ocean_model","S_tendency"          ,"S_tendency",               "tracer","all",.true.,"none",2
+"ocean_model","opottemptend"        ,"opottemptend",             "tracer","all",.true.,"none",2
+"ocean_model","osalttend"           ,"osalttend",                "tracer","all",.true.,"none",2
+"ocean_model","opottemptend_2d"     ,"opottemptend_2d",          "tracer","all",.true.,"none",2
+"ocean_model","osalttend_2d"        ,"osalttend_2d",             "tracer","all",.true.,"none",2
+"ocean_model","T_advection_xy"      ,"T_advection_xy",           "tracer","all",.true.,"none",2
+"ocean_model","S_advection_xy"      ,"S_advection_xy",           "tracer","all",.true.,"none",2
+"ocean_model","T_advection_xy_2d"   ,"T_advection_xy_2d",        "tracer","all",.true.,"none",2
+"ocean_model","S_advection_xy_2d"   ,"S_advection_xy_2d",        "tracer","all",.true.,"none",2
+"ocean_model","T_tendency_vert_remap","T_tendency_vert_remap",   "tracer","all",.true.,"none",2
+#"ocean_model","S_tendency_vert_remap","S_tendency_vert_remap",   "tracer","all",.true.,"none",2
+"ocean_model","Th_tendency_vert_remap","Th_tendency_vert_remap", "tracer","all",.true.,"none",2
+#"ocean_model","Sh_tendency_vert_remap","Sh_tendency_vert_remap", "tracer","all",.true.,"none",2
+"ocean_model","Th_tendency_vert_remap_2d","Th_tendency_vert_remap_2d", "tracer","all",.true.,"none",2
+#"ocean_model","Sh_tendency_vert_remap_2d","Sh_tendency_vert_remap_2d", "tracer","all",.true.,"none",2
+"ocean_model","frazil_heat_tendency","frazil_heat_tendency", "tracer","all",.true.,"none",2
+"ocean_model","frazil_heat_tendency_2d","frazil_heat_tendency_2d", "tracer","all",.true.,"none",2
+"ocean_model","frazil_temp_tendency","frazil_temp_tendency", "tracer","all",.true.,"none",2
+
+# neutral diffusion tendencies for T and S 
+#==================
+"ocean_model","opottemppmdiff","opottemppmdiff",                  "tracer","all",.true.,"none",2
+#"ocean_model","osaltpmdiff","osaltpmdiff",                        "tracer","all",.true.,"none",2
+"ocean_model","opottemppmdiff_2d","opottemppmdiff_2d",             "tracer","all",.true.,"none",2
+#"ocean_model","osaltpmdiff_2d","osaltpmdiff_2d",                  "tracer","all",.true.,"none",2
+#"ocean_model","ndiff_tracer_conc_tendency_T","ndiff_tracer_conc_tendency_T","tracer","all",.true.,"none",2
+#"ocean_model","ndiff_tracer_conc_tendency_S","ndiff_tracer_conc_tendency_S","tracer","all",.true.,"none",2
+
+# diabatic diffusion tendencies for T and S
+# note: opottempdiff_2d = 0 
+#==================
+"ocean_model","opottempdiff"               ,"opottempdiff",               "tracer","all",.true.,"none",2
+"ocean_model","osaltdiff"                  ,"osaltdiff",                  "tracer","all",.true.,"none",2
+"ocean_model","opottempdiff_2d"          ,"opottempdiff_2d",          "tracer","all",.true.,"none",2
+"ocean_model","osaltdiff_2d"             ,"osaltdiff_2d",             "tracer","all",.true.,"none",2
+"ocean_model","diabatic_diff_temp_tendency","diabatic_diff_temp_tendency","tracer","all",.true.,"none",2
+"ocean_model","diabatic_diff_saln_tendency","diabatic_diff_saln_tendency","tracer","all",.true.,"none",2
+
 
 
 # Momentum Balance Terms:
@@ -172,19 +235,6 @@
 #"ocean_model","av_visc","av_visc","visc","all",.true.,"none",2
 #"ocean_model","au_visc","au_visc","visc","all",.true.,"none",2
 #"ocean_model","FrictWork","FrictWork","visc","all",.true.,"none",2
-"ocean_model","KPP_uStar","KPP_uStar","visc","all",.true.,"none",2
-"ocean_model","KPP_buoyFlux","KPP_buoyFlux","visc","all",.true.,"none",2
-"ocean_model","KPP_OBLdepth","KPP_OBLdepth","visc","all",.true.,"none",2
-"ocean_model","KPP_BulkRi","KPP_BulkRi","visc","all",.true.,"none",2
-"ocean_model","KPP_Ws","KPP_Ws","visc","all",.true.,"none",2
-"ocean_model","KPP_N","KPP_N","visc","all",.true.,"none",2
-"ocean_model","KPP_vt2","KPP_vt2","visc","all",.true.,"none",2
-"ocean_model","KPP_BulkUz2","KPP_BulkUz2","visc","all",.true.,"none",2
-"ocean_model","KPP_BulkDrho","KPP_BulkDrho","visc","all",.true.,"none",2
-"ocean_model","KPP_Kheat","KPP_Kheat","visc","all",.true.,"none",2
-"ocean_model","KPP_Ksalt","KPP_Ksalt","visc","all",.true.,"none",2
-"ocean_model","KPP_NLtransport_heat","KPP_NLtransport_heat","visc","all",.true.,"none",2
-"ocean_model","KPP_NLtransport_salt","KPP_NLtransport_salt","visc","all",.true.,"none",2
 "ocean_model","MLD_003","MLD_003","visc","all",.true.,"none",2
 "ocean_model","subML_N2","subML_N2","visc","all",.true.,"none",2
 "ocean_model","MEKE","MEKE","visc","all",.true.,"none",2
@@ -274,6 +324,25 @@
 "ocean_model","total_salt_flux_in"           ,"total_salt_flux_in",           "forcing","all",.true.,"none",2
 "ocean_model","total_salt_flux_restore"      ,"total_salt_flux_restore",      "forcing","all",.true.,"none",2
 #
+#
+ "ocean_model",  "hfgeou",          "hfgeou",           "cmor2",        "all", "none", "none",2  # geothermal heat flux
+ "ocean_model",  "hfrainds",        "hfrainds",         "cmor2",        "all", "mean", "none",2
+ "ocean_model",  "hfevapds",        "hfevapds",         "cmor2",        "all", "mean", "none",2
+ "ocean_model",  "hfrunoffds",      "hfrunoffds",       "cmor2",        "all", "mean", "none",2
+ "ocean_model",  "hfsnthermds",     "hfsnthermds",      "cmor2",        "all", "mean", "none",2
+ "ocean_model",  "hfsifrazil",      "hfsifrazil",       "cmor2",        "all", "mean", "none",2
+#"ocean_model",  "hfsithermds",     "hfsithermds",      "cmor2",        "all", "mean", "none",2  # computed in SIS2 
+ "ocean_model",  "hfibthermds",     "hfibthermds",      "cmor2",        "all", "mean", "none",2  
+ "ocean_model",  "hfsolidrunoffds", "hfsolidrunoffds",  "cmor2",        "all", "mean", "none",2  # =0 if ice = 0C  
+ "ocean_model",  "rlntds",          "rlntds",           "cmor2",        "all", "mean", "none",2 
+ "ocean_model",  "hfls",            "hfls",             "cmor2",        "all", "mean", "none",2  
+ "ocean_model",  "hfss",            "hfss",             "cmor2",        "all", "mean", "none",2  
+ "ocean_model",  "rsntds",          "rsntds"            "cmor2",        "all", "mean", "none",2  
+ "ocean_model",  "rsdoabsorb",      "rsdoabsorb"        "cmor2",        "all", "mean", "none",2 
+ "ocean_model",  "rsdo",            "rsdo"              "cmor2",        "all", "mean", "none",2 
+ "ocean_model",  "hfds",            "hfds"              "cmor2",        "all", "mean", "none",2 
+#
+#
 # Fields for CMIP6 (CMOR Names):
 #=======================================
 "ocean_model","pso","pso"                   ,"cmor","all",.true.,"none",2  # GFDL Name: p_surf
@@ -281,6 +350,7 @@
 "ocean_model","tauvo","tauvo"               ,"cmor","all",.true.,"none",2  # surface j-stress
 "ocean_model","wfo","wfo"                   ,"cmor","all",.true.,"none",2  # GFDL Name: PRCmE
 "ocean_model","rsntds","rsntds"             ,"cmor","all",.true.,"none",2  # GFDL Name: SW
+"ocean_model","rlntds","rlntds"             ,"cmor","all",.true.,"none",2  # GFDL Name: SW
 "ocean_model","hfibthermds","hfibthermds"   ,"cmor","all",.true.,"none",2  # GFDL Name: heat_content_frunoff
 "ocean_model","hfrunoffds","hfrunoffds"     ,"cmor","all",.true.,"none",2  # GFDL Name: runoff_heat_content
 "ocean_model","hfsifrazil","hfsifrazil"     ,"cmor","all",.true.,"none",2  # GFDL Name: frazil
@@ -288,7 +358,7 @@
 "ocean_model","prsn","prsn"                 ,"cmor","all",.true.,"none",2  # GFDL Name: fprec
 "ocean_model","hfls","hfls"                 ,"cmor","all",.true.,"none",2  # GFDL Name: latent
 "ocean_model","friver","friver"             ,"cmor","all",.true.,"none",2  # GFDL Name: lrunoff
-"ocean_model","rlds","rlds"                 ,"cmor","all",.true.,"none",2  # GFDL Name: LW
+#"ocean_model","rlds","rlds"                 ,"cmor","all",.true.,"none",2  # GFDL Name: LW
 "ocean_model","hfss","hfss"                 ,"cmor","all",.true.,"none",2  # GFDL Name: sensible
 "ocean_model","hfds","hfds"                 ,"cmor","all",.true.,"none",2  # GFDL Name: net_heat_surface
 "ocean_model","sfdsi","sfdsi"               ,"cmor","all",.true.,"none",2  # GFDL Name: salt_flux
@@ -315,11 +385,12 @@
 #
 # Z-Space Fields Provided for CMIP6 (CMOR Names):
 #===============================================
-"ocean_model_z","uo","uo"    ,"cmor_z","all",.true.,"none",2			#GFDL Name: u_z
-"ocean_model_z","vo","vo"    ,"cmor_z","all",.true.,"none",2			#GFDL Name: v_z
-"ocean_model_z","so","so"    ,"cmor_z","all",.true.,"none",2			#GFDL Name: salt_z
-"ocean_model_z","umo" ,"umo" ,"cmor_z","all",.true.,"none",2			#GFDL Name: uh_z
-"ocean_model_z","vmo" ,"vmo" ,"cmor_z","all",.true.,"none",2			#GFDL Name: vh_z
+"ocean_model_z","uo",    "uo",    "cmor_z","all",.true.,"none",2  #GFDL Name: u_z
+"ocean_model_z","vo",    "vo",    "cmor_z","all",.true.,"none",2  #GFDL Name: v_z
+"ocean_model_z","so",    "so",    "cmor_z","all",.true.,"none",2  #GFDL Name: salt_z
+"ocean_model_z","thetao","thetao","cmor_z","all",.true.,"none",2  #GFDL Name: temp_z
+"ocean_model_z","umo",   "umo",   "cmor_z","all",.true.,"none",2  #GFDL Name: uh_z
+"ocean_model_z","vmo",   "vmo",   "cmor_z","all",.true.,"none",2  #GFDL Name: vh_z
 #
 # Scalar ocean fields for CMIP6 (CMOR Names):
 #=====================
@@ -330,6 +401,25 @@
 "ocean_model", "sosga",       "sosga",       "cmor_scalar",  "all", .true.,  "none",2  # area mean SSS
 "ocean_model", "volo",        "volo",        "cmor_scalar",  "all", .true.,  "none",2  # ocean volume 
 
+# Scalar fields for run-time monitoring:
+#=======================================
+"ocean_model", "masso",               "masso",               "scalar",  "all", .true.,  "none",2  # global mean masscello
+"ocean_model", "thetaoga",            "thetaoga",            "scalar",  "all", .true.,  "none",2  # global mean theta
+"ocean_model", "soga",                "soga",                "scalar",  "all", .true.,  "none",2  # global mean salinity
+"ocean_model", "tosga",               "tosga",               "scalar",  "all", .true.,  "none",2  # area mean SST
+"ocean_model", "sosga",               "sosga",               "scalar",  "all", .true.,  "none",2  # area mean SSS
+"ocean_model", "volo",                "volo",                "scalar",  "all", .true.,  "none",2  # ocean volume
+"ocean_model", "ssh_ga",              "ssh_ga",              "scalar",  "all", .true.,  "none",2  # global mean ssh
+"ocean_model", "prcme_ga",            "prcme_ga",            "scalar",  "all", .true.,  "none",2  # global mean prcme
+"ocean_model", "precip_ga",           "precip_ga",           "scalar",  "all", .true.,  "none",2  # global mean precip
+"ocean_model", "evap_ga",             "evap_ga",             "scalar",  "all", .true.,  "none",2  # global mean evaporation
+"ocean_model", "net_heat_coupler_ga", "net_heat_coupler_ga", "scalar",  "all", .true.,  "none",2  # global mean net heat coupler
+"ocean_model", "net_heat_surface_ga", "net_heat_surface_ga", "scalar",  "all", .true.,  "none",2  # global mean net heat surface
+"ocean_model", "sens_ga",             "sens_ga",             "scalar",  "all", .true.,  "none",2  # global mean sensible heat
+"ocean_model", "LwLatSens_ga",        "LwLatSens_ga",        "scalar",  "all", .true.,  "none",2  # global mean LW + latent + sensible
+"ocean_model", "sw_ga",               "sw_ga",               "scalar",  "all", .true.,  "none",2  # global mean SW
+"ocean_model", "lw_ga",               "lw_ga",               "scalar",  "all", .true.,  "none",2  # global mean LW
+"ocean_model", "lat_ga",              "lat_ga",              "scalar",  "all", .true.,  "none",2  # global mean latent
 
 # Static ocean fields:
 #=====================

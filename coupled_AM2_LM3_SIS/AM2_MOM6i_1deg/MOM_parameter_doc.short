@@ -11,6 +11,9 @@ NJGLOBAL = 210                  !
                                 ! y-direction in the physical domain. With STATIC_MEMORY_
                                 ! this is set in MOM_memory.h at compile time.
 
+! === module MOM_hor_index ===
+! Sets the horizontal array index types.
+
 ! === module MOM_grid ===
 ! Parameters providing information about the vertical grid.
 NK = 63                         !   [nondim]
@@ -329,8 +332,9 @@ KHTH_MAX = 900.0                !   [m2 s-1] default = 0.0
 ! === module MOM_mixed_layer_restrat ===
 MIXEDLAYER_RESTRAT = True       !   [Boolean] default = False
                                 ! If true, a density-gradient dependent re-stratifying
-                                ! flow is imposed in the mixed layer.
-                                ! This is only used if BULKMIXEDLAYER is true.
+                                ! flow is imposed in the mixed layer. Can be used in ALE mode
+                                ! without restriction but in layer mode can only be used if
+                                ! BULKMIXEDLAYER is true.
 FOX_KEMPER_ML_RESTRAT_COEF = 20.0 !   [nondim] default = 0.0
                                 ! A nondimensional coefficient that is proportional to
                                 ! the ratio of the deformation radius to the dominant
@@ -350,6 +354,32 @@ Z_OUTPUT_GRID_FILE = "OM3_zgrid.nc" ! default = ""
 
 ! === module MOM_diabatic_driver ===
 ! The following parameters are used for diabatic processes.
+
+! === module MOM_KPP ===
+! This is the MOM wrapper to CVmix:KPP
+! See http://code.google.com/p/cvmix/
+
+! === module MOM_diffConvection ===
+! This module implements enhanced diffusivity as a
+! function of static stability, N^2.
+CONVECTION%
+%CONVECTION
+
+! === module MOM_entrain_diffusive ===
+MAX_ENT_IT = 20                 ! default = 5
+                                ! The maximum number of iterations that may be used to
+                                ! calculate the interior diapycnal entrainment.
+TOLERANCE_ENT = 1.0E-05         !   [m] default = 2.683281572999748E-05
+                                ! The tolerance with which to solve for entrainment values.
+
+! === module MOM_geothermal ===
+GEOTHERMAL_SCALE = 0.001        !   [W m-2 or various] default = 0.0
+                                ! The constant geothermal heat flux, a rescaling
+                                ! factor for the heat flux read from GEOTHERMAL_FILE, or
+                                ! 0 to disable the geothermal heating.
+GEOTHERMAL_FILE = "geothermal_heating_cm2g.nc" ! default = ""
+                                ! The file from which the geothermal heating is to be
+                                ! read, or blank to use a constant heating rate.
 ML_RADIATION = True             !   [Boolean] default = False
                                 ! If true, allow a fraction of TKE available from wind
                                 ! work to penetrate below the base of the mixed layer
@@ -422,31 +452,8 @@ MAX_RINO_IT = 25                !   [nondim] default = 50
                                 ! The maximum number of iterations that may be used to
                                 ! estimate the Richardson number driven mixing.
 
-! === module MOM_KPP ===
-! This is the MOM wrapper to CVmix:KPP
-! See http://code.google.com/p/cvmix/
-
-! === module MOM_diffConvection ===
-! This module implements enhanced diffusivity as a
-! function of static stability, N^2.
-CONVECTION%
-%CONVECTION
-
-! === module MOM_entrain_diffusive ===
-MAX_ENT_IT = 20                 ! default = 5
-                                ! The maximum number of iterations that may be used to
-                                ! calculate the interior diapycnal entrainment.
-TOLERANCE_ENT = 1.0E-05         !   [m] default = 2.683281572999748E-05
-                                ! The tolerance with which to solve for entrainment values.
-
-! === module MOM_geothermal ===
-GEOTHERMAL_SCALE = 0.001        !   [W m-2 or various] default = 0.0
-                                ! The constant geothermal heat flux, a rescaling
-                                ! factor for the heat flux read from GEOTHERMAL_FILE, or
-                                ! 0 to disable the geothermal heating.
-GEOTHERMAL_FILE = "geothermal_heating_cm2g.nc" ! default = ""
-                                ! The file from which the geothermal heating is to be
-                                ! read, or blank to use a constant heating rate.
+! === module MOM_diabatic_aux ===
+! The following parameters are used for auxiliary diabatic processes.
 
 ! === module MOM_mixed_layer ===
 BULK_RI_ML = 0.05               !   [nondim]
@@ -524,10 +531,18 @@ ML_KHTR_SCALE = 0.0             !   [nondim] default = 1.0
                                 ! horizontal diffusivity in the mixed layer to the
                                 ! epipycnal diffusivity.  The valid range is 0 to 1.
 
+! === module MOM_neutral_diffusion ===
+! This module implements neutral diffusion of tracers
+
 ! === module ocean_model_init ===
 ENERGYSAVEDAYS = 0.25           !   [days] default = 1.0
                                 ! The interval in units of TIMEUNIT between saves of the
                                 ! energies of the run and other globally summed diagnostics.
+OCEAN_SURFACE_STAGGER = "B"     ! default = "C"
+                                ! A case-insensitive character string to indicate the
+                                ! staggering of the surface velocity field that is
+                                ! returned to the coupler.  Valid values include
+                                ! 'A', 'B', or 'C'.
 
 ! === module MOM_surface_forcing ===
 MAX_P_SURF = 7.0E+04            !   [Pa] default = -1.0

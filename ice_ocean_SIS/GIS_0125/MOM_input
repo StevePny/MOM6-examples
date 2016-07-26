@@ -94,12 +94,8 @@ NJHALO = 4                      !  points on each side in the x- and y-direction
                                 !  If static memory allocation is used, these
                                 !  must match the values of NIHALO_ and NJHALO_
                                 !  in MOM_memory.h.
-NIPROC_IO = 8                   !    The number of processors used for I/O in the
-                                !  x-direction, or 0 to equal NIPROC.  NIPROC_IO
-                                !  must be a factor of NIPROC.
-NJPROC_IO = 4                   !    The number of processors used for I/O in the
-                                !  y-direction, or 0 to equal NJPROC.  NJPROC_IO
-                                !  must be a factor of NJPROC.
+IO_LAYOUT = 8, 4                !    The processor layout to be used, or 0,0 to automatically
+                                !  set the io_layout to be the same as the layout.
 
 NIPROC = 32                     ! The number of processors used in the x and y directions
                                 ! respectively.
@@ -166,10 +162,10 @@ ETA_TOLERANCE_AUX = 1e-3        !    The equivalent to ETA_TOLERANCE for the
 !  Specify properties of the I/O and length of the integration.
 TIMEUNIT = 86400.0              !    The time unit in seconds for the following
                                 !  fields.
-ENERGYSAVEDAYS = 10.0            !    The number of days between saves of the
+ENERGYSAVEDAYS = 10.0           !    The number of days between saves of the
                                 !  energies of the run.
 ENERGYFILE = "timestats"        !    The file to use to save the energies.
-RESTARTFILE = "MOM.res"        !    The name of the restart file.
+RESTARTFILE = "MOM.res"         !    The name of the restart file.
 RESTINT = 365.0                 !    The number of days between saves of the
                                 !  restart file.  Use a value that is larger than
                                 !  DAYMAX not to save incremental restart files
@@ -425,6 +421,11 @@ CORRECT_DENSITY = True          !    If CORRECT_DENSITY is defined, the layer
 !  Specify the properties of the surface forcing.
 WIND_STAGGER = "B"              !  "A", "B", or "C" to indicate the
                                 !  staggering of the wind stresses.
+OCEAN_SURFACE_STAGGER = "B"     ! default = "B"
+                                ! A case-insensitive character string to indicate the
+                                ! staggering of the surface velocity field that is
+                                ! returned to the coupler.  Valid values include
+                                ! 'A', 'B', or 'C'.
 
 !  Specify the properties of the passive tracers.
 KHTR = 0.0                      ! KHTR is the along-isopycnal tracer diffusivity, in m2 s-1.
@@ -516,7 +517,10 @@ CORRECT_ABSORPTION_DEPTH = True ! If true, the depth at which penetrating
                                 ! shortwave radiation is absorbed is corrected by
                                 ! moving some of the heating upward in the water
                                 ! column.  The default is false.
-ML_USE_OMEGA = True             !    Use Omega instead of f in ML code
+ML_OMEGA_FRAC = 1.0             !   [nondim] default = 0.0
+                                ! When setting the decay scale for turbulence, use this
+                                ! fraction of the absolute rotation rate blended with the
+                                ! local value of f, as sqrt((1-of)*f^2 + of*4*omega^2).
 TKE_DECAY = 10.0                !    TKE_DECAY relates the vertical rate of decay
                                 !  of the TKE available for mechanical entrain-
                                 !  ment to the natural Ekman depth.  Nondim.

@@ -33,6 +33,16 @@ NJGLOBAL = 2                    !
                                 ! The total number of thickness grid points in the
                                 ! y-direction in the physical domain. With STATIC_MEMORY_
                                 ! this is set in MOM_memory.h at compile time.
+NIHALO = 2                      ! default = 4
+                                ! The number of halo points on each side in the
+                                ! x-direction.  With STATIC_MEMORY_ this is set as NIHALO_
+                                ! in MOM_memory.h at compile time; without STATIC_MEMORY_
+                                ! the default is NIHALO_ in MOM_memory.h (if defined) or 2.
+NJHALO = 2                      ! default = 4
+                                ! The number of halo points on each side in the
+                                ! y-direction.  With STATIC_MEMORY_ this is set as NJHALO_
+                                ! in MOM_memory.h at compile time; without STATIC_MEMORY_
+                                ! the default is NJHALO_ in MOM_memory.h (if defined) or 2.
 !NIPROC = 1                     !
                                 ! The number of processors in the x-direction. With
                                 ! STATIC_MEMORY_ this is set in MOM_memory.h at compile time.
@@ -277,7 +287,7 @@ MAXVEL = 6.0                    !   [m s-1] default = 3.0E+08
 ! === module MOM_PointAccel ===
 
 ! === module MOM_set_visc ===
-PRANDTL_TURB = 1.0              !   [nondim] default = 0.0
+PRANDTL_TURB = 1.0              !   [nondim] default = 1.0
                                 ! The turbulent Prandtl number applied to shear
                                 ! instability.
 DRAG_BG_VEL = 0.1               !   [m s-1] default = 0.0
@@ -322,11 +332,10 @@ ML_RADIATION = True             !   [Boolean] default = False
                                 ! length scale.
 TKE_DECAY = 10.0                !   [nondim] default = 2.5
                                 ! The ratio of the natural Ekman depth to the TKE decay scale.
-ML_USE_OMEGA = True             !   [Boolean] default = False
-                                ! If true, use the absolute rotation rate instead of the
-                                ! vertical component of rotation when setting the decay
-                                ! scale for turbulence in the mixed layer.
-                                ! This is only used if ML_RADIATION is true.
+ML_OMEGA_FRAC = 1.0             !   [nondim] default = 0.0
+                                ! When setting the decay scale for turbulence, use this
+                                ! fraction of the absolute rotation rate blended with the
+                                ! local value of f, as sqrt((1-of)*f^2 + of*4*omega^2).
 KD = 2.0E-05                    !   [m2 s-1]
                                 ! The background diapycnal diffusivity of density in the
                                 ! interior. Zero or the molecular value, ~1e-7 m2 s-1,
@@ -423,7 +432,7 @@ MAXCPU = 2.88E+04               !   [wall-clock seconds] default = -1.0
                                 ! factor of the number of processors used.
 
 ! === module MOM_main (MOM_driver) ===
-DAYMAX = 365.0                  !   [days]
+DAYMAX = 180.0                  !   [days]
                                 ! The final time of the whole simulation, in units of
                                 ! TIMEUNIT seconds.  This also sets the potential end
                                 ! time of the present run segment if the end time is
@@ -438,6 +447,6 @@ RESTINT = 3650.0                !   [days] default = 0.0
                                 ! The interval between saves of the restart file in units
                                 ! of TIMEUNIT.  Use 0 (the default) to not save
                                 ! incremental restart files at all.
-ENERGYSAVEDAYS = 1.0            !   [days] default = 3600.0
+ENERGYSAVEDAYS = 10.0           !   [days] default = 3600.0
                                 ! The interval in units of TIMEUNIT between saves of the
                                 ! energies of the run and other globally summed diagnostics.

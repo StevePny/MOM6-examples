@@ -34,12 +34,8 @@ NJHALO = 1                      !  points on each side in the x- and y-direction
                                 !  If static memory allocation is used, these
                                 !  must match the values of NIHALO_ and NJHALO_
                                 !  in MOM_memory.h.
-NIPROC_IO = 1                   !    The number of processors used for I/O in the
-                                !  x-direction, or 0 to equal NIPROC.  NIPROC_IO
-                                !  must be a factor of NIPROC.
-NJPROC_IO = 1                   !    The number of processors used for I/O in the
-                                !  y-direction, or 0 to equal NJPROC.  NJPROC_IO
-                                !  must be a factor of NJPROC.
+IO_LAYOUT = 1, 1                !    The processor layout to be used, or 0,0 to automatically
+                                !  set the io_layout to be the same as the layout.
 
 REENTRANT_X = True              !    If defined, the domain is zonally reentrant.
 REENTRANT_Y = False             !    If defined, the domain is meridionally
@@ -67,7 +63,7 @@ DT_RHEOLOGY = 100.0             ! The sub-cycling time step, in s, for iterating
                                 ! via NSTEPS_DYN.
 
 !  Specify the ice properties.
-SIS1_5L_THERMODYNAMICS = True   !    If true, use the thermodynamic calculations
+SIS1_5L_THERMODYNAMICS = False  !    If true, use the thermodynamic calculations
                                 !  inhereted from SIS1. Otherwise, use the newer
                                 !  SIS2 version.
 ICE_STRENGTH_PSTAR = 2.75e4     !    ICE_STRENGTH_PSTAR is a constant in the
@@ -92,3 +88,5 @@ ICE_BULK_SALINITY = 5.0         !    The fixed bulk salinity of sea ice, in g/kg
 WIND_STAGGER = "B"              !  "A", "B", or "C" to indicate the
                                 !  staggering of the wind stresses between the
                                 !  sea ice and ocean.
+ADD_DIURNAL_SW = True           !    If true, add a synthetic diurnal cycle to
+                                !  the shortwave radiation.

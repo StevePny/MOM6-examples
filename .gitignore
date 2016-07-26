@@ -1,10 +1,10 @@
 # Build directory might optionally be placed here
-build
+build*
 # Ignore .datasets
 .datasets
 # Ignore model output
 *.out
-CPU_stats
+CPU_stats.*
 _read_error.nml
 available_diags.0*
 SIS.available_diags
@@ -16,3 +16,5 @@ RESTART
 # Ignore python .pyc files
 *.pyc
 .ipynb_checkpoints
+# Ignore anything labeled ignore
+*.ignore

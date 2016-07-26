@@ -38,12 +38,8 @@ NJHALO = 2                      !  points on each side in the x- and y-direction
                                 !  If static memory allocation is used, these
                                 !  must match the values of NIHALO_ and NJHALO_
                                 !  in MOM_memory.h.
-NIPROC_IO = 1                   !    The number of processors used for I/O in the
-                                !  x-direction, or 0 to equal NIPROC.  NIPROC_IO
-                                !  must be a factor of NIPROC.
-NJPROC_IO = 1                   !    The number of processors used for I/O in the
-                                !  y-direction, or 0 to equal NJPROC.  NJPROC_IO
-                                !  must be a factor of NJPROC.
+IO_LAYOUT = 1, 1                !    The processor layout to be used, or 0,0 to automatically
+                                !  set the io_layout to be the same as the layout.
 
 REENTRANT_X = True              !    If defined, the domain is zonally reentrant.
 REENTRANT_Y = False             !    If defined, the domain is meridionally
@@ -65,12 +61,6 @@ DT_ICE_DYNAMICS = 3600.0        ! The time step used for the slow ice dynamics,
                                 ! including stepping the continuity equation and
                                 ! interactions between the ice mass field and 
                                 ! velocities, in s.
-INTERSPERSED_ICE_THERMO = False ! If true, the sea ice thermodynamic updates are applied
-                                ! after the new velocities are determined, but before the
-                                ! transport occurs.  Otherwise, the ice thermodynamic
-                                ! updates occur at the start of the slow ice update and
-                                ! dynamics and continuity can occur together.
-                                ! The default should be changed to false.
 
 DT_RHEOLOGY = 100.0             ! The sub-cycling time step, in s, for iterating
                                 ! the rheology and ice momentum equations. If
@@ -114,3 +104,5 @@ ICE_OCEAN_STRESS_STAGGER = "C"  ! default = "B"
                                 ! staggering of the stress field on the ocean that is
                                 ! returned to the coupler.  Valid values include
                                 ! 'A', 'B', or 'C'.
+ADD_DIURNAL_SW = True           !    If true, add a synthetic diurnal cycle to
+                                !  the shortwave radiation.

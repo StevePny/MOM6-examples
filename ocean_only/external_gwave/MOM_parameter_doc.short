@@ -1,31 +1,4 @@
 ! This file was written by the model and records the non-default parameters used at run-time.
-REENTRANT_X = False             !   [Boolean] default = True
-                                ! If true, the domain is zonally reentrant.
-REENTRANT_Y = True              !   [Boolean] default = False
-                                ! If true, the domain is meridionally reentrant.
-NIGLOBAL = 128                  !
-                                ! The total number of thickness grid points in the
-                                ! x-direction in the physical domain. With STATIC_MEMORY_
-                                ! this is set in MOM_memory.h at compile time.
-NJGLOBAL = 4                    !
-                                ! The total number of thickness grid points in the
-                                ! y-direction in the physical domain. With STATIC_MEMORY_
-                                ! this is set in MOM_memory.h at compile time.
-
-! === module MOM_grid ===
-! Parameters providing information about the vertical grid.
-RHO_0 = 1000.0                  !   [kg m-3] default = 1035.0
-                                ! The mean ocean density used with BOUSSINESQ true to
-                                ! calculate accelerations and the mass for conservation
-                                ! properties, or with BOUSSINSEQ false to convert some
-                                ! parameters from vertical units of m to kg m-2.
-ANGSTROM = 1.0E-15              !   [m] default = 1.0E-10
-                                ! The minumum layer thickness, usually one-Angstrom.
-NK = 21                         !   [nondim]
-                                ! The number of model layers.
-
-! === module MOM_verticalGrid ===
-! Parameters providing information about the vertical grid.
 
 ! === module MOM ===
 BULKMIXEDLAYER = False          !   [Boolean] default = True
@@ -33,7 +6,8 @@ BULKMIXEDLAYER = False          !   [Boolean] default = True
                                 ! with transitional buffer layers.  Layers 1 through
                                 ! NKML+NKBL have variable densities. There must be at
                                 ! least NKML+NKBL+1 layers if BULKMIXEDLAYER is true.
-                                ! The default is the same setting as ENABLE_THERMODYNAMICS.
+                                ! BULKMIXEDLAYER can not be used with USE_REGRIDDING.
+                                ! The default is influenced by ENABLE_THERMODYNAMICS.
 DT = 60.0                       !   [s]
                                 ! The (baroclinic) dynamics time step.  The time-step that
                                 ! is actually used will be an integer fraction of the
@@ -57,14 +31,49 @@ SAVE_INITIAL_CONDS = True       !   [Boolean] default = False
 IC_OUTPUT_FILE = "GOLD_IC"      ! default = "MOM_IC"
                                 ! The file into which to write the initial conditions.
 
+! === module MOM_domains ===
+REENTRANT_X = False             !   [Boolean] default = True
+                                ! If true, the domain is zonally reentrant.
+REENTRANT_Y = True              !   [Boolean] default = False
+                                ! If true, the domain is meridionally reentrant.
+NIGLOBAL = 128                  !
+                                ! The total number of thickness grid points in the
+                                ! x-direction in the physical domain. With STATIC_MEMORY_
+                                ! this is set in MOM_memory.h at compile time.
+NJGLOBAL = 4                    !
+                                ! The total number of thickness grid points in the
+                                ! y-direction in the physical domain. With STATIC_MEMORY_
+                                ! this is set in MOM_memory.h at compile time.
+
+! === module MOM_hor_index ===
+! Sets the horizontal array index types.
+
+! === module MOM_verticalGrid ===
+! Parameters providing information about the vertical grid.
+RHO_0 = 1000.0                  !   [kg m-3] default = 1035.0
+                                ! The mean ocean density used with BOUSSINESQ true to
+                                ! calculate accelerations and the mass for conservation
+                                ! properties, or with BOUSSINSEQ false to convert some
+                                ! parameters from vertical units of m to kg m-2.
+ANGSTROM = 1.0E-15              !   [m] default = 1.0E-10
+                                ! The minumum layer thickness, usually one-Angstrom.
+NK = 21                         !   [nondim]
+                                ! The number of model layers.
+
 ! === module MOM_tracer_registry ===
+
+! === module MOM_EOS ===
 EQN_OF_STATE = "LINEAR"         ! default = "WRIGHT"
                                 ! EQN_OF_STATE determines which ocean equation of state
                                 ! should be used.  Currently, the valid choices are
                                 ! "LINEAR", "UNESCO", and "WRIGHT".
                                 ! This is only used if USE_EOS is true.
 
+! === module MOM_restart ===
+
 ! === module MOM_tracer_flow_control ===
+
+! === module MOM_fixed_initialization ===
 INPUTDIR = "INPUT"              ! default = "."
                                 ! The directory in which input files are found.
 
@@ -106,6 +115,8 @@ TOPO_CONFIG = "flat"            !
                                 !     benchmark - use the benchmark test case topography.
                                 !     DOME - use a slope and channel configuration for the
                                 !       DOME sill-overflow test case.
+                                !     ISOMIP - use a slope and channel configuration for the
+                                !       ISOMIP test case.
                                 !     DOME2D - use a shelf and slope configuration for the
                                 !       DOME2D gravity current/overflow test case.
                                 !     seamount - Gaussian bump for spontaneous motion test case.
@@ -115,6 +126,17 @@ MINIMUM_DEPTH = 0.01            !   [m] default = 0.0
                                 ! The minimum depth of the ocean.
 MAXIMUM_DEPTH = 20.0            !   [m]
                                 ! The maximum depth of the ocean.
+
+! === module MOM_open_boundary ===
+! Controls where open boundaries are located, what kind of boundary condition to impose, and what data to apply, if any.
+ROTATION = "beta"               ! default = "2omegasinlat"
+                                ! This specifies how the Coriolis parameter is specified:
+                                !     2omegasinlat - Use twice the planetary rotation rate
+                                !       times the sine of latitude.
+                                !     betaplane - Use a beta-plane or f-plane.
+                                !     USER - call a user modified routine.
+
+! === module MOM_coord_initialization ===
 COORD_CONFIG = "layer_ref"      !
                                 ! This specifies how layers are to be defined:
                                 !     file - read coordinate information from the file
@@ -134,12 +156,11 @@ LIGHTEST_DENSITY = 1022.0       !   [kg m-3] default = 1000.0
                                 ! The reference potential density used for layer 1.
 DENSITY_RANGE = 5.0             !   [kg m-3] default = 2.0
                                 ! The range of reference potential densities in the layers.
-ROTATION = "beta"               ! default = "2omegasinlat"
-                                ! This specifies how the Coriolis parameter is specified:
-                                !     2omegasinlat - Use twice the planetary rotation rate
-                                !       times the sine of latitude.
-                                !     betaplane - Use a beta-plane or f-plane.
-                                !     USER - call a user modified routine.
+
+! === module MOM_grid ===
+! Parameters providing information about the lateral grid.
+
+! === module MOM_state_initialization ===
 THICKNESS_CONFIG = "external_gwave" !
                                 ! A string that determines how the initial layer
                                 ! thicknesses are specified for a new run:
@@ -151,6 +172,8 @@ THICKNESS_CONFIG = "external_gwave" !
                                 !       between the surface and MAXIMUM_DEPTH.
                                 !     DOME - use a slope and channel configuration for the
                                 !       DOME sill-overflow test case.
+                                !     ISOMIP - use a configuration for the
+                                !       ISOMIP test case.
                                 !     benchmark - use the benchmark test case thicknesses.
                                 !     search - search a density profile for the interface
                                 !       densities. This is not yet implemented.
@@ -177,6 +200,7 @@ TS_CONFIG = "fit"               !
                                 !     benchmark - use the benchmark test case T & S.
                                 !     linear - linear in logical layer space.
                                 !     DOME2D - 2D DOME initialization.
+                                !     ISOMIP - ISOMIP initialization.
                                 !     adjustment2d - TBD AJA.
                                 !     sloshing - TBD AJA.
                                 !     seamount - TBD AJA.
@@ -185,6 +209,8 @@ TS_CONFIG = "fit"               !
                                 !     USER - call a user modified routine.
 T_REF = 5.0                     !   [degC]
                                 ! A reference temperature used in initialization.
+
+! === module MOM_diag_mediator ===
 
 ! === module MOM_MEKE ===
 
@@ -214,8 +240,17 @@ BBL_THICK_MIN = 0.1             !   [m] default = 0.0
                                 ! used with BOTTOMDRAGLAW. This might be
                                 ! Kv / (cdrag * drag_bg_vel) to give Kv as the minimum
                                 ! near-bottom viscosity.
-KV_BBL_MIN = 1.0E-06            !   [m2 s-1] default = 0.0
+KV = 1.0E-04                    !   [m2 s-1]
+                                ! The background kinematic viscosity in the interior.
+                                ! The molecular value, ~1e-6 m2 s-1, may be used.
+KV_BBL_MIN = 1.0E-06            !   [m2 s-1] default = 1.0E-04
                                 ! The minimum viscosities in the bottom boundary layer.
+
+! === module MOM_continuity ===
+
+! === module MOM_continuity_PPM ===
+
+! === module MOM_CoriolisAdv ===
 BOUND_CORIOLIS = True           !   [Boolean] default = False
                                 ! If true, the Coriolis terms at u-points are bounded by
                                 ! the four estimates of (f+rv)v from the four neighboring
@@ -226,6 +261,10 @@ KE_SCHEME = "KE_GUDONOV"        ! default = "KE_ARAKAWA"
                                 ! KE_SCHEME selects the discretization for acceleration
                                 ! due to the kinetic energy gradient. Valid values are:
                                 !    KE_ARAKAWA, KE_SIMPLE_GUDONOV, KE_GUDONOV
+
+! === module MOM_PressureForce ===
+
+! === module MOM_PressureForce_AFV ===
 
 ! === module MOM_hor_visc ===
 LAPLACIAN = True                !   [Boolean] default = False
@@ -254,9 +293,6 @@ HMIX_FIXED = 1.0E-10            !   [m]
                                 ! The prescribed depth over which the near-surface
                                 ! viscosity and diffusivity are elevated when the bulk
                                 ! mixed layer is not used.
-KV = 1.0E-04                    !   [m2 s-1]
-                                ! The background kinematic viscosity in the interior.
-                                ! The molecular value, ~1e-6 m2 s-1, may be used.
 MAXVEL = 10.0                   !   [m s-1] default = 3.0E+08
                                 ! The maximum velocity allowed before the velocity
                                 ! components are truncated.
@@ -305,19 +341,10 @@ DTBT = 20.0                     !   [s or nondim] default = -0.98
 
 ! === module MOM_mixed_layer_restrat ===
 
+! === module MOM_diag_to_Z ===
+
 ! === module MOM_diabatic_driver ===
 ! The following parameters are used for diabatic processes.
-BBL_EFFIC = 0.0                 !   [nondim] default = 0.2
-                                ! The efficiency with which the energy extracted by
-                                ! bottom drag drives BBL diffusion.  This is only
-                                ! used if BOTTOMDRAGLAW is true.
-KD = 0.0                        !   [m2 s-1]
-                                ! The background diapycnal diffusivity of density in the
-                                ! interior. Zero or the molecular value, ~1e-7 m2 s-1,
-                                ! may be used.
-
-! === module MOM_kappa_shear ===
-! Parameterization of shear-driven turbulence following Jackson, Hallberg and Legg, JPO 2008
 
 ! === module MOM_KPP ===
 ! This is the MOM wrapper to CVmix:KPP
@@ -340,6 +367,22 @@ MAX_ENT_IT = 20                 ! default = 5
 TOLERANCE_ENT = 1.0E-05         !   [m] default = 1.0E-13
                                 ! The tolerance with which to solve for entrainment values.
 
+! === module MOM_set_diffusivity ===
+BBL_EFFIC = 0.0                 !   [nondim] default = 0.2
+                                ! The efficiency with which the energy extracted by
+                                ! bottom drag drives BBL diffusion.  This is only
+                                ! used if BOTTOMDRAGLAW is true.
+KD = 0.0                        !   [m2 s-1]
+                                ! The background diapycnal diffusivity of density in the
+                                ! interior. Zero or the molecular value, ~1e-7 m2 s-1,
+                                ! may be used.
+
+! === module MOM_kappa_shear ===
+! Parameterization of shear-driven turbulence following Jackson, Hallberg and Legg, JPO 2008
+
+! === module MOM_diabatic_aux ===
+! The following parameters are used for auxiliary diabatic processes.
+
 ! === module MOM_regularize_layers ===
 
 ! === module MOM_opacity ===
@@ -347,6 +390,9 @@ TOLERANCE_ENT = 1.0E-05         !   [m] default = 1.0E-13
 ! === module MOM_tracer_advect ===
 
 ! === module MOM_tracer_hor_diff ===
+
+! === module MOM_neutral_diffusion ===
+! This module implements neutral diffusion of tracers
 
 ! === module MOM_surface_forcing ===
 VARIABLE_WINDS = False          !   [Boolean] default = True
@@ -363,14 +409,20 @@ WIND_CONFIG = "zero"            !
                                 ! is specified. Valid options include (file), (2gyre),
                                 ! (1gyre), (gyres), (zero), and (USER).
 
+! === module MOM_restart ===
+
 ! === module MOM_sum_output ===
 MAXTRUNC = 10                   !   [truncations save_interval-1] default = 0
                                 ! The run will be stopped, and the day set to a very
                                 ! large value if the velocity is truncated more than
                                 ! MAXTRUNC times between energy saves.  Set MAXTRUNC to 0
                                 ! to stop if there is any truncation of velocities.
+DATE_STAMPED_STDOUT = False     !   [Boolean] default = True
+                                ! If true, use dates (not times) in messages to stdout
 TIMEUNIT = 1.0                  !   [s] default = 8.64E+04
                                 ! The time unit in seconds a number of input fields
+
+! === module MOM_write_cputime ===
 MAXCPU = 2.88E+04               !   [wall-clock seconds] default = -1.0
                                 ! The maximum amount of cpu time per processor for which
                                 ! MOM should run before saving a restart file and
@@ -397,6 +449,5 @@ RESTART_CONTROL = -1            ! default = 1
                                 ! (bit 0) for a non-time-stamped file. A non-time-stamped
                                 ! restart file is saved at the end of the run segment
                                 ! for any non-negative value.
-ENERGYSAVEDAYS = 600.0          !   [seconds] default = 5.184E+07
-                                ! The interval in units of TIMEUNIT between saves of the
-                                ! energies of the run and other globally summed diagnostics.
+
+! === module MOM_file_parser ===

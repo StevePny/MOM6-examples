@@ -1,25 +1,4 @@
 ! This file was written by the model and records the non-default parameters used at run-time.
-NIGLOBAL = 60                   !
-                                ! The total number of thickness grid points in the
-                                ! x-direction in the physical domain. With STATIC_MEMORY_
-                                ! this is set in MOM_memory.h at compile time.
-NJGLOBAL = 80                   !
-                                ! The total number of thickness grid points in the
-                                ! y-direction in the physical domain. With STATIC_MEMORY_
-                                ! this is set in MOM_memory.h at compile time.
-
-! === module MOM_grid ===
-! Parameters providing information about the vertical grid.
-RHO_0 = 1031.0                  !   [kg m-3] default = 1035.0
-                                ! The mean ocean density used with BOUSSINESQ true to
-                                ! calculate accelerations and the mass for conservation
-                                ! properties, or with BOUSSINSEQ false to convert some
-                                ! parameters from vertical units of m to kg m-2.
-NK = 2                          !   [nondim]
-                                ! The number of model layers.
-
-! === module MOM_verticalGrid ===
-! Parameters providing information about the vertical grid.
 
 ! === module MOM ===
 ENABLE_THERMODYNAMICS = False   !   [Boolean] default = True
@@ -51,11 +30,38 @@ SAVE_INITIAL_CONDS = True       !   [Boolean] default = False
                                 ! If true, write the initial conditions to a file given
                                 ! by IC_OUTPUT_FILE.
 
+! === module MOM_domains ===
+NIGLOBAL = 60                   !
+                                ! The total number of thickness grid points in the
+                                ! x-direction in the physical domain. With STATIC_MEMORY_
+                                ! this is set in MOM_memory.h at compile time.
+NJGLOBAL = 80                   !
+                                ! The total number of thickness grid points in the
+                                ! y-direction in the physical domain. With STATIC_MEMORY_
+                                ! this is set in MOM_memory.h at compile time.
+
+! === module MOM_hor_index ===
+! Sets the horizontal array index types.
+
+! === module MOM_verticalGrid ===
+! Parameters providing information about the vertical grid.
+RHO_0 = 1031.0                  !   [kg m-3] default = 1035.0
+                                ! The mean ocean density used with BOUSSINESQ true to
+                                ! calculate accelerations and the mass for conservation
+                                ! properties, or with BOUSSINSEQ false to convert some
+                                ! parameters from vertical units of m to kg m-2.
+NK = 2                          !   [nondim]
+                                ! The number of model layers.
+
 ! === module MOM_tracer_registry ===
+
+! === module MOM_restart ===
 MAX_FIELDS = 50                 ! default = 100
                                 ! The maximum number of restart fields that can be used.
 
 ! === module MOM_tracer_flow_control ===
+
+! === module MOM_fixed_initialization ===
 INPUTDIR = "INPUT"              ! default = "."
                                 ! The directory in which input files are found.
 
@@ -94,6 +100,8 @@ TOPO_CONFIG = "flat"            !
                                 !     benchmark - use the benchmark test case topography.
                                 !     DOME - use a slope and channel configuration for the
                                 !       DOME sill-overflow test case.
+                                !     ISOMIP - use a slope and channel configuration for the
+                                !       ISOMIP test case.
                                 !     DOME2D - use a shelf and slope configuration for the
                                 !       DOME2D gravity current/overflow test case.
                                 !     seamount - Gaussian bump for spontaneous motion test case.
@@ -103,6 +111,23 @@ MINIMUM_DEPTH = 1.0             !   [m] default = 0.0
                                 ! The minimum depth of the ocean.
 MAXIMUM_DEPTH = 2000.0          !   [m]
                                 ! The maximum depth of the ocean.
+
+! === module MOM_open_boundary ===
+! Controls where open boundaries are located, what kind of boundary condition to impose, and what data to apply, if any.
+ROTATION = "beta"               ! default = "2omegasinlat"
+                                ! This specifies how the Coriolis parameter is specified:
+                                !     2omegasinlat - Use twice the planetary rotation rate
+                                !       times the sine of latitude.
+                                !     betaplane - Use a beta-plane or f-plane.
+                                !     USER - call a user modified routine.
+F_0 = 6.49E-05                  !   [s-1] default = 0.0
+                                ! The reference value of the Coriolis parameter with the
+                                ! betaplane option.
+BETA = 2.0E-11                  !   [m-1 s-1] default = 0.0
+                                ! The northward gradient of the Coriolis parameter with
+                                ! the betaplane option.
+
+! === module MOM_coord_initialization ===
 COORD_CONFIG = "gprime"         !
                                 ! This specifies how layers are to be defined:
                                 !     file - read coordinate information from the file
@@ -120,18 +145,11 @@ COORD_CONFIG = "gprime"         !
                                 !     USER - call a user modified routine.
 GINT = 0.0196                   !   [m s-2]
                                 ! The reduced gravity across internal interfaces.
-ROTATION = "beta"               ! default = "2omegasinlat"
-                                ! This specifies how the Coriolis parameter is specified:
-                                !     2omegasinlat - Use twice the planetary rotation rate
-                                !       times the sine of latitude.
-                                !     betaplane - Use a beta-plane or f-plane.
-                                !     USER - call a user modified routine.
-F_0 = 6.49E-05                  !   [s-1] default = 0.0
-                                ! The reference value of the Coriolis parameter with the
-                                ! betaplane option.
-BETA = 2.0E-11                  !   [m-1 s-1] default = 0.0
-                                ! The northward gradient of the Coriolis parameter with
-                                ! the betaplane option.
+
+! === module MOM_grid ===
+! Parameters providing information about the lateral grid.
+
+! === module MOM_state_initialization ===
 THICKNESS_CONFIG = "phillips"   !
                                 ! A string that determines how the initial layer
                                 ! thicknesses are specified for a new run:
@@ -143,6 +161,8 @@ THICKNESS_CONFIG = "phillips"   !
                                 !       between the surface and MAXIMUM_DEPTH.
                                 !     DOME - use a slope and channel configuration for the
                                 !       DOME sill-overflow test case.
+                                !     ISOMIP - use a configuration for the
+                                !       ISOMIP test case.
                                 !     benchmark - use the benchmark test case thicknesses.
                                 !     search - search a density profile for the interface
                                 !       densities. This is not yet implemented.
@@ -178,6 +198,7 @@ SPONGE_CONFIG = "phillips"      ! default = "file"
                                 ! A string that sets how the sponges are configured:
                                 !     file - read sponge properties from the file
                                 !       specified by (SPONGE_FILE).
+                                !     ISOMIP - apply ale sponge in the ISOMIP case
                                 !     DOME - use a slope and channel configuration for the
                                 !       DOME sill-overflow test case.
                                 !     USER - call a user modified routine.
@@ -185,6 +206,8 @@ SPONGE_RATE = 1.157407407407407E-06 !   [s-1] default = 1.157407407407407E-06
                                 ! The rate at which the zonal-mean sponges damp.
 !Total sponge columns = 0       !
                                 ! The total number of columns where sponges are applied.
+
+! === module MOM_diag_mediator ===
 
 ! === module MOM_MEKE ===
 
@@ -241,18 +264,31 @@ BBL_THICK_MIN = 0.1             !   [m] default = 0.0
                                 ! used with BOTTOMDRAGLAW. This might be
                                 ! Kv / (cdrag * drag_bg_vel) to give Kv as the minimum
                                 ! near-bottom viscosity.
+KV = 1.0E-04                    !   [m2 s-1]
+                                ! The background kinematic viscosity in the interior.
+                                ! The molecular value, ~1e-6 m2 s-1, may be used.
+
+! === module MOM_continuity ===
+
+! === module MOM_continuity_PPM ===
+
+! === module MOM_CoriolisAdv ===
 BOUND_CORIOLIS = True           !   [Boolean] default = False
                                 ! If true, the Coriolis terms at u-points are bounded by
                                 ! the four estimates of (f+rv)v from the four neighboring
                                 ! v-points, and similarly at v-points.  This option would
                                 ! have no effect on the SADOURNY Coriolis scheme if it
                                 ! were possible to use centered difference thickness fluxes.
+
+! === module MOM_PressureForce ===
 ANALYTIC_FV_PGF = False         !   [Boolean] default = True
                                 ! If true the pressure gradient forces are calculated
                                 ! with a finite volume form that analytically integrates
                                 ! the equations of state in pressure to avoid any
                                 ! possibility of numerical thermobaric instability, as
                                 ! described in Adcroft et al., O. Mod. (2008).
+
+! === module MOM_PressureForce_Mont ===
 
 ! === module MOM_hor_visc ===
 AH_VEL_SCALE = 0.003            !   [m s-1] default = 0.0
@@ -279,9 +315,6 @@ HMIX_FIXED = 20.0               !   [m]
                                 ! The prescribed depth over which the near-surface
                                 ! viscosity and diffusivity are elevated when the bulk
                                 ! mixed layer is not used.
-KV = 1.0E-04                    !   [m2 s-1]
-                                ! The background kinematic viscosity in the interior.
-                                ! The molecular value, ~1e-6 m2 s-1, may be used.
 KVML = 0.01                     !   [m2 s-1] default = 1.0E-04
                                 ! The kinematic viscosity in the mixed layer.  A typical
                                 ! value is ~1e-2 m2 s-1. KVML is not used if
@@ -325,17 +358,10 @@ KHTH = 8000.0                   !   [m2 s-1] default = 0.0
 
 ! === module MOM_mixed_layer_restrat ===
 
+! === module MOM_diag_to_Z ===
+
 ! === module MOM_diabatic_driver ===
 ! The following parameters are used for diabatic processes.
-KD = 1.0E-04                    !   [m2 s-1]
-                                ! The background diapycnal diffusivity of density in the
-                                ! interior. Zero or the molecular value, ~1e-7 m2 s-1,
-                                ! may be used.
-KD_MIN = 1.0E-06                !   [m2 s-1] default = 1.0E-06
-                                ! The minimum diapycnal diffusivity.
-
-! === module MOM_kappa_shear ===
-! Parameterization of shear-driven turbulence following Jackson, Hallberg and Legg, JPO 2008
 
 ! === module MOM_KPP ===
 ! This is the MOM wrapper to CVmix:KPP
@@ -354,11 +380,28 @@ MAX_ENT_IT = 20                 ! default = 5
 TOLERANCE_ENT = 1.0E-05         !   [m] default = 2.449489742783178E-05
                                 ! The tolerance with which to solve for entrainment values.
 
+! === module MOM_set_diffusivity ===
+KD = 1.0E-04                    !   [m2 s-1]
+                                ! The background diapycnal diffusivity of density in the
+                                ! interior. Zero or the molecular value, ~1e-7 m2 s-1,
+                                ! may be used.
+KD_MIN = 1.0E-06                !   [m2 s-1] default = 1.0E-06
+                                ! The minimum diapycnal diffusivity.
+
+! === module MOM_kappa_shear ===
+! Parameterization of shear-driven turbulence following Jackson, Hallberg and Legg, JPO 2008
+
+! === module MOM_diabatic_aux ===
+! The following parameters are used for auxiliary diabatic processes.
+
 ! === module MOM_regularize_layers ===
 
 ! === module MOM_tracer_advect ===
 
 ! === module MOM_tracer_hor_diff ===
+
+! === module MOM_neutral_diffusion ===
+! This module implements neutral diffusion of tracers
 
 ! === module MOM_surface_forcing ===
 VARIABLE_WINDS = False          !   [Boolean] default = True
@@ -375,7 +418,13 @@ WIND_CONFIG = "zero"            !
                                 ! is specified. Valid options include (file), (2gyre),
                                 ! (1gyre), (gyres), (zero), and (USER).
 
+! === module MOM_restart ===
+
 ! === module MOM_sum_output ===
+DATE_STAMPED_STDOUT = False     !   [Boolean] default = True
+                                ! If true, use dates (not times) in messages to stdout
+
+! === module MOM_write_cputime ===
 
 ! === module MOM_main (MOM_driver) ===
 DT_FORCING = 3600.0             !   [s] default = 600.0
@@ -397,6 +446,8 @@ RESTINT = 730.0                 !   [days] default = 0.0
                                 ! The interval between saves of the restart file in units
                                 ! of TIMEUNIT.  Use 0 (the default) to not save
                                 ! incremental restart files at all.
-ENERGYSAVEDAYS = 1.0            !   [days] default = 3600.0
+ENERGYSAVEDAYS = 1.0            !   [days] default = 0.0416666666666667
                                 ! The interval in units of TIMEUNIT between saves of the
                                 ! energies of the run and other globally summed diagnostics.
+
+! === module MOM_file_parser ===
